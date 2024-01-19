@@ -23,6 +23,7 @@ class EmissionsMapperTest {
         expected.put(Emission.HC, 11.08);
         expected.put(Emission.PM, 2.86);
         expected.put(Emission.SO2, 0.63);
+        expected.put(Emission.CO2_OVERALL_EQUIVALENTS, 90786.067);
 
         Assertions.assertEquals(expected, emissionsDataContainer.emissions());
     }

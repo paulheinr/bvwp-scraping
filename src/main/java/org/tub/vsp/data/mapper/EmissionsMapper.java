@@ -9,7 +9,6 @@ import org.tub.vsp.data.container.EmissionsDataContainer;
 import org.tub.vsp.data.type.Emission;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,19 +20,26 @@ public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
     public EmissionsDataContainer mapDocument(Document document) {
         EmissionsDataContainer emissions = EmissionsDataContainer.empty();
 
-        Optional<Element> table = getEmissionsTable(document);
+        Optional<Element> table = JSoupUtils.getTableByClassAndContainedText(document, "table.table_wirkung_strasse",
+                "Veränderung der Abgasemissionen");
         if (table.isEmpty()) {
             return emissions;
         }
 
         Map<Emission, Double> collect =
-                Emission.STRING_IDENTIFIER_BY_EMISSION_WITH_LIFE_CYCLE_CO2
+                Emission.STRING_IDENTIFIER_BY_EMISSION_WITHOUT_CO2_OVERALL
                         .entrySet()
                         .stream()
                         .map(e -> getEmissionDoubleEntry(e, table.get()))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Element envTable = JSoupUtils.getTableByClassAndContainedText(document, "table.table_webprins",
+                                             "Äquivalenten aus Lebenszyklusemissionen")
+                                     .orElseThrow();
+
+        collect.put(Emission.CO2_OVERALL_EQUIVALENTS, getCO2Overall(envTable));
 
         return new EmissionsDataContainer(collect);
     }
@@ -61,27 +67,16 @@ public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
                                                      .text()));
     }
 
-    private Optional<Element> getEmissionsTable(Document document) {
-        List<Element> list = document.select("table.table_wirkung_strasse")
-                                     .stream()
-                                     .filter(this::isEmissionTable)
-                                     .toList();
-
-        if (list.isEmpty()) {
-            logger.warn("Could not find any emission table.");
-            return Optional.empty();
-        } else if (list.size() > 1) {
-            logger.warn("Found more than one emission table.");
-            return Optional.empty();
-        }
-
-        return Optional.of(list.getFirst());
-    }
-
-    private boolean isEmissionTable(Element element) {
-        return element.select("tr")
-                      .stream()
-                      .anyMatch(r -> r.text()
-                                      .contains("Veränderung der Abgasemissionen"));
+    private Double getCO2Overall(Element table) {
+        return JSoupUtils.firstRowWithKeyInCol(table, Emission.STRING_IDENTIFIER_CO2_OVERALL_EQUIVALENTS, 1)
+                         .map(r -> {
+                             try {
+                                 return JSoupUtils.parseDouble(r.child(2)
+                                                                .text());
+                             } catch (ParseException e) {
+                                 throw new RuntimeException(e);
+                             }
+                         })
+                         .orElse(null);
     }
 }

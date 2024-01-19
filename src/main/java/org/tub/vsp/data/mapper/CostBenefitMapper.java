@@ -121,7 +121,7 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
     }
 
     private Map<Emission, Benefit> extractEmissionsBenefit(Element table) {
-        return Emission.STRING_IDENTIFIER_BY_EMISSION_WITH_LIFE_CYCLE_CO2
+        return Emission.STRING_IDENTIFIER_BY_EMISSION_WITHOUT_CO2_OVERALL
                 .entrySet()
                 .stream()
                 .map(e -> Map.entry(e.getKey(), extractSimpleBenefit(table, e.getValue(), 0)))

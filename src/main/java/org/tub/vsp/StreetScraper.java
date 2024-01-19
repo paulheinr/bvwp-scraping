@@ -16,6 +16,10 @@ import java.util.Optional;
 public class StreetScraper extends Scraper {
     private static final Logger logger = LogManager.getLogger(StreetScraper.class);
 
+    private final ProjectInformationMapper projectInformationMapper = new ProjectInformationMapper();
+    private final PhysicalEffectMapper physicalEffectMapper = new PhysicalEffectMapper();
+    private final CostBenefitMapper costBenefitMapper = new CostBenefitMapper();
+
     @Override
     protected String getBaseUrl() {
         return "https://www.bvwp-projekte.de/strasse/";
@@ -27,13 +31,13 @@ public class StreetScraper extends Scraper {
         logger.info(projectUrls);
 
         return projectUrls.stream()
-                          .map(this::getStreetBaseData)
+                          .map(this::getStreetBaseDataFromUrl)
                           .filter(Optional::isPresent)
                           .map(Optional::get)
                           .toList();
     }
 
-    private Optional<StreetBaseDataContainer> getStreetBaseData(String projectUrl) {
+    private Optional<StreetBaseDataContainer> getStreetBaseDataFromUrl(String projectUrl) {
         Document doc;
 
         try {
@@ -41,17 +45,11 @@ public class StreetScraper extends Scraper {
                        .get();
         } catch (IOException e) {
             logger.warn("Could not connect to {}", projectUrl);
-            logger.warn("Skipping project {}", projectUrl);
+            logger.warn("Skipping project.");
             return Optional.empty();
         }
 
-        if (!checkIfProjectIsScrapable(doc)) {
-            return Optional.empty();
-        }
-
-        StreetBaseDataContainer streetBaseDataContainer = new StreetBaseDataContainer();
-        return Optional.of(streetBaseDataContainer.setUrl(projectUrl)
-                                                  .setProjectInformation(new ProjectInformationMapper().mapDocument(doc)));
+        return getStreetBaseData(doc);
     }
 
     public Optional<StreetBaseDataContainer> getStreetBaseData(Document doc) {
@@ -60,9 +58,9 @@ public class StreetScraper extends Scraper {
         }
 
         StreetBaseDataContainer streetBaseDataContainer = new StreetBaseDataContainer();
-        return Optional.of(streetBaseDataContainer.setProjectInformation(new ProjectInformationMapper().mapDocument(doc))
-                                                  .setPhysicalEffect(new PhysicalEffectMapper().mapDocument(doc))
-                                                  .setCostBenefitAnalysis(new CostBenefitMapper().mapDocument(doc)));
+        return Optional.of(streetBaseDataContainer.setProjectInformation(projectInformationMapper.mapDocument(doc))
+                                                  .setPhysicalEffect(physicalEffectMapper.mapDocument(doc))
+                                                  .setCostBenefitAnalysis(costBenefitMapper.mapDocument(doc)));
     }
 
     private boolean checkIfProjectIsScrapable(Document doc) {

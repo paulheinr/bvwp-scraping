@@ -1,13 +1,19 @@
 package org.tub.vsp;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 public class JSoupUtils {
+    private static final Logger logger = LogManager.getLogger(JSoupUtils.class);
+
     public static String getTextFromRowAndCol(Element table, int rowIndex, int colIndex) {
         return table.select("tr")
                     .get(rowIndex)
@@ -29,5 +35,30 @@ public class JSoupUtils {
         return NumberFormat.getInstance(Locale.GERMANY)
                            .parse(s)
                            .doubleValue();
+    }
+
+    public static Optional<Element> getTableByClassAndContainedText(Document document, String cssClass,
+                                                                    String textToContain) {
+        List<Element> list = document.select(cssClass)
+                                     .stream()
+                                     .filter(e -> anyRowContainsText(e, textToContain))
+                                     .toList();
+
+        if (list.isEmpty()) {
+            logger.warn("Could not find any fitting table.");
+            return Optional.empty();
+        } else if (list.size() > 1) {
+            logger.warn("Found more than one fitting table.");
+            return Optional.empty();
+        }
+
+        return Optional.of(list.getFirst());
+    }
+
+    private static boolean anyRowContainsText(Element element, String textToContain) {
+        return element.select("tr")
+                      .stream()
+                      .anyMatch(r -> r.text()
+                                      .contains(textToContain));
     }
 }

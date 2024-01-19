@@ -21,7 +21,7 @@ public class ProjectInformationMapper implements DocumentMapper<ProjectInformati
 
         return projectInformation.setProjectNumber(projectNumber)
                                  .setStreet(street)
-                                 .setSeverity(Severity.valueOf(severity));
+                                 .setSeverity(Severity.getFromString(severity));
     }
 
     private static String extractInformation(Document document, int tableIndex, String key) {

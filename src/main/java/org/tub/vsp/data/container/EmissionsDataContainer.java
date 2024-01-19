@@ -7,5 +7,4 @@ public class EmissionsDataContainer {
     private double hc;
     private double pm;
     private double so;
-
 }

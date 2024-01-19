@@ -34,7 +34,8 @@ public class StreetScraper extends Scraper {
         Document doc;
 
         try {
-            doc = Jsoup.connect(projectUrl).get();
+            doc = Jsoup.connect(projectUrl)
+                       .get();
         } catch (IOException e) {
             logger.warn("Could not connect to {}", projectUrl);
             logger.warn("Skipping project {}", projectUrl);
@@ -48,6 +49,18 @@ public class StreetScraper extends Scraper {
         StreetBaseDataContainer streetBaseDataContainer = new StreetBaseDataContainer();
         return Optional.of(streetBaseDataContainer.setUrl(projectUrl)
                                                   .setProjectInformation(new ProjectInformationMapper().mapDocument(doc)));
+    }
+
+    protected Optional<StreetBaseDataContainer> getStreetBaseData(Document doc) {
+        if (!checkIfProjectIsScrapable(doc)) {
+            return Optional.empty();
+        }
+
+        StreetBaseDataContainer streetBaseDataContainer = new StreetBaseDataContainer();
+        return Optional.of(streetBaseDataContainer.setProjectInformation(new ProjectInformationMapper().mapDocument(doc))
+                                                  .setEmissions(new EmissionsMapper().mapDocument(doc))
+                                                  .setPhysicalEffect(new PhysicalEffectMapper().mapDocument(doc))
+                                                  .setCostBenefitAnalysis(new CostBenefitMapper().mapDocument(doc)));
     }
 
     private boolean checkIfProjectIsScrapable(Document doc) {

@@ -7,6 +7,6 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
 
     @Override
     public CostBenefitAnalysisDataContainer mapDocument(Document document) {
-        return null;
+        return new CostBenefitAnalysisDataContainer();
     }
 }

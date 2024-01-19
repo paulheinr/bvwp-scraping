@@ -1,10 +1,12 @@
 package org.tub.vsp.data.container;
 
-public class EmissionsDataContainer {
-    private double nox;
-    private double co;
-    private double co2;
-    private double hc;
-    private double pm;
-    private double so;
+import org.tub.vsp.data.type.EmissionType;
+
+import java.util.Map;
+
+public record EmissionsDataContainer(Map<EmissionType, Double> emissions) {
+
+    public static EmissionsDataContainer empty() {
+        return new EmissionsDataContainer(Map.of());
+    }
 }

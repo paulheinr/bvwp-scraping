@@ -58,7 +58,6 @@ public class StreetScraper extends Scraper {
 
         StreetBaseDataContainer streetBaseDataContainer = new StreetBaseDataContainer();
         return Optional.of(streetBaseDataContainer.setProjectInformation(new ProjectInformationMapper().mapDocument(doc))
-                                                  .setEmissions(new EmissionsMapper().mapDocument(doc))
                                                   .setPhysicalEffect(new PhysicalEffectMapper().mapDocument(doc))
                                                   .setCostBenefitAnalysis(new CostBenefitMapper().mapDocument(doc)));
     }

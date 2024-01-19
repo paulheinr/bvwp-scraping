@@ -1,11 +1,11 @@
 package org.tub.vsp.data.container;
 
-import org.tub.vsp.data.type.EmissionType;
+import org.tub.vsp.data.type.Emission;
 
 import java.util.Map;
 import java.util.Objects;
 
-public record EmissionsDataContainer(Map<EmissionType, Double> emissions) {
+public record EmissionsDataContainer(Map<Emission, Double> emissions) {
 
     public static EmissionsDataContainer empty() {
         return new EmissionsDataContainer(Map.of());

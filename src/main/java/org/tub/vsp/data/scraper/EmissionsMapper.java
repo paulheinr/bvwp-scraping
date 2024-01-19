@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.tub.vsp.data.container.EmissionsDataContainer;
-import org.tub.vsp.data.type.EmissionType;
+import org.tub.vsp.data.type.Emission;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
     private static final Logger logger = LogManager.getLogger(EmissionsMapper.class);
 
-    private static final Map<EmissionType, Integer> TABLE_ROW_INDEX_BY_EMISSION_TYPE = Map.of(
-            EmissionType.NOX, 1,
-            EmissionType.CO, 2,
-            EmissionType.CO2, 3,
-            EmissionType.HC, 4,
-            EmissionType.PM, 5,
-            EmissionType.SO2, 6
+    private static final Map<Emission, Integer> TABLE_ROW_INDEX_BY_EMISSION_TYPE = Map.of(
+            Emission.NOX, 1,
+            Emission.CO, 2,
+            Emission.CO2, 3,
+            Emission.HC, 4,
+            Emission.PM, 5,
+            Emission.SO2, 6
     );
 
     @Override
@@ -36,17 +36,17 @@ public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
             return emissions;
         }
 
-        Map<EmissionType, Double> collect =
+        Map<Emission, Double> collect =
                 TABLE_ROW_INDEX_BY_EMISSION_TYPE.entrySet()
                                                 .stream()
                                                 .map(e -> {
                                                     Double v;
                                                     try {
-                                                        v = mapEmissionInTable(table.get(), e.getValue());
+                                                        v = mapEmissionFromRow(table.get(), e.getValue());
                                                     } catch (ParseException ex) {
                                                         logger.warn("Could not parse emission value for {}",
                                                                 e.getKey());
-                                                        return Optional.<Map.Entry<EmissionType, Double>>empty();
+                                                        return Optional.<Map.Entry<Emission, Double>>empty();
                                                     }
                                                     return Optional.of(Map.entry(e.getKey(), v));
                                                 })
@@ -57,7 +57,7 @@ public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
         return new EmissionsDataContainer(collect);
     }
 
-    private Double mapEmissionInTable(Element table, int rowIndex) throws ParseException {
+    private Double mapEmissionFromRow(Element table, int rowIndex) throws ParseException {
         return NumberFormat.getInstance(Locale.GERMANY)
                            .parse(table.select("tr")
                                        .get(rowIndex)

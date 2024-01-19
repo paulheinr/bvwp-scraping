@@ -23,7 +23,6 @@ class StreetScraperTest {
         StreetBaseDataContainer streetBaseDataContainer = streetBaseData.get();
 
         Assertions.assertNotNull(streetBaseDataContainer.getProjectInformation());
-        Assertions.assertNotNull(streetBaseDataContainer.getEmissions());
         Assertions.assertNotNull(streetBaseDataContainer.getPhysicalEffect());
         Assertions.assertNotNull(streetBaseDataContainer.getCostBenefitAnalysis());
     }

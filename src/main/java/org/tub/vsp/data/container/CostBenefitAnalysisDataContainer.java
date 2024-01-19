@@ -2,7 +2,7 @@ package org.tub.vsp.data.container;
 
 import org.tub.vsp.data.type.Benefit;
 import org.tub.vsp.data.type.Cost;
-import org.tub.vsp.data.type.EmissionType;
+import org.tub.vsp.data.type.Emission;
 
 import java.util.Map;
 import java.util.Objects;
@@ -16,10 +16,118 @@ public class CostBenefitAnalysisDataContainer {
     private Benefit ni;
     private Benefit nl;
     private Benefit ng;
-    private Map<EmissionType, Benefit> na;
+    private Map<Emission, Benefit> na;
     private Benefit nt;
     private Benefit nz;
     private Cost cost;
+
+    public Benefit getNb() {
+        return nb;
+    }
+
+    public CostBenefitAnalysisDataContainer setNb(Benefit nb) {
+        this.nb = nb;
+        return this;
+    }
+
+    public Benefit getNw() {
+        return nw;
+    }
+
+    public CostBenefitAnalysisDataContainer setNw(Benefit nw) {
+        this.nw = nw;
+        return this;
+    }
+
+    public Benefit getNs() {
+        return ns;
+    }
+
+    public CostBenefitAnalysisDataContainer setNs(Benefit ns) {
+        this.ns = ns;
+        return this;
+    }
+
+    public Benefit getNrz() {
+        return nrz;
+    }
+
+    public CostBenefitAnalysisDataContainer setNrz(Benefit nrz) {
+        this.nrz = nrz;
+        return this;
+    }
+
+    public Benefit getNtz() {
+        return ntz;
+    }
+
+    public CostBenefitAnalysisDataContainer setNtz(Benefit ntz) {
+        this.ntz = ntz;
+        return this;
+    }
+
+    public Benefit getNi() {
+        return ni;
+    }
+
+    public CostBenefitAnalysisDataContainer setNi(Benefit ni) {
+        this.ni = ni;
+        return this;
+    }
+
+    public Benefit getNl() {
+        return nl;
+    }
+
+    public CostBenefitAnalysisDataContainer setNl(Benefit nl) {
+        this.nl = nl;
+        return this;
+    }
+
+    public Benefit getNg() {
+        return ng;
+    }
+
+    public CostBenefitAnalysisDataContainer setNg(Benefit ng) {
+        this.ng = ng;
+        return this;
+    }
+
+    public Map<Emission, Benefit> getNa() {
+        return na;
+    }
+
+    public CostBenefitAnalysisDataContainer setNa(Map<Emission, Benefit> na) {
+        this.na = na;
+        return this;
+    }
+
+    public Benefit getNt() {
+        return nt;
+    }
+
+    public CostBenefitAnalysisDataContainer setNt(Benefit nt) {
+        this.nt = nt;
+        return this;
+    }
+
+    public Benefit getNz() {
+        return nz;
+    }
+
+    public CostBenefitAnalysisDataContainer setNz(Benefit nz) {
+        this.nz = nz;
+        return this;
+    }
+
+    public Cost getCost() {
+        return cost;
+    }
+
+    public CostBenefitAnalysisDataContainer setCost(Cost cost) {
+        this.cost = cost;
+        return this;
+    }
 
     public Benefit overallBenefits() {
         //TODO

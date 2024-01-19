@@ -7,7 +7,6 @@ public class StreetBaseDataContainer {
 
     private ProjectInformationDataContainer projectInformation;
     private PhysicalEffectDataContainer physicalEffect;
-    private EmissionsDataContainer emissions;
     private CostBenefitAnalysisDataContainer costBenefitAnalysis;
 
     public String getUrl() {
@@ -34,15 +33,6 @@ public class StreetBaseDataContainer {
 
     public StreetBaseDataContainer setPhysicalEffect(PhysicalEffectDataContainer physicalEffect) {
         this.physicalEffect = physicalEffect;
-        return this;
-    }
-
-    public EmissionsDataContainer getEmissions() {
-        return emissions;
-    }
-
-    public StreetBaseDataContainer setEmissions(EmissionsDataContainer emissions) {
-        this.emissions = emissions;
         return this;
     }
 
@@ -75,9 +65,6 @@ public class StreetBaseDataContainer {
         if (!Objects.equals(physicalEffect, that.physicalEffect)) {
             return false;
         }
-        if (!Objects.equals(emissions, that.emissions)) {
-            return false;
-        }
         return Objects.equals(costBenefitAnalysis, that.costBenefitAnalysis);
     }
 
@@ -86,7 +73,6 @@ public class StreetBaseDataContainer {
         int result = url != null ? url.hashCode() : 0;
         result = 31 * result + (projectInformation != null ? projectInformation.hashCode() : 0);
         result = 31 * result + (physicalEffect != null ? physicalEffect.hashCode() : 0);
-        result = 31 * result + (emissions != null ? emissions.hashCode() : 0);
         result = 31 * result + (costBenefitAnalysis != null ? costBenefitAnalysis.hashCode() : 0);
         return result;
     }

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.tub.vsp.JSoupUtils;
 import org.tub.vsp.data.container.CostBenefitAnalysisDataContainer;
 import org.tub.vsp.data.type.Benefit;
 import org.tub.vsp.data.type.Cost;
@@ -84,14 +85,8 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
         Double costs;
         Double overallCosts;
         try {
-            costs = parseDouble(table.select("tr")
-                                     .get(3)
-                                     .child(1)
-                                     .text());
-            overallCosts = parseDouble(table.select("tr")
-                                            .get(3)
-                                            .child(2)
-                                            .text());
+            costs = parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 1));
+            overallCosts = parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 2));
         } catch (ParseException e) {
             logger.warn("Could not parse benefit value from {}", table);
             return null;
@@ -105,14 +100,9 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
     }
 
     private Benefit extractSimpleBenefit(Element table, String key, int columnIndex) {
-        return table.select("tr")
-                    .stream()
-                    .filter(tr -> tr.child(columnIndex)
-                                    .text()
-                                    .contains(key))
-                    .findFirst()
-                    .map(this::extractBenefitFromRow)
-                    .orElse(null);
+        return JSoupUtils.firstRowWithKeyInCol(table, key, columnIndex)
+                         .map(this::extractBenefitFromRow)
+                         .orElse(null);
     }
 
     private Benefit extractBenefitFromRow(Element e) {

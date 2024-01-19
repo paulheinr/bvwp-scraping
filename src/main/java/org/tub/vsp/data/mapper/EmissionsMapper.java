@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.tub.vsp.JSoupUtils;
 import org.tub.vsp.data.container.EmissionsDataContainer;
 import org.tub.vsp.data.type.Emission;
 
@@ -18,15 +19,6 @@ import java.util.stream.Collectors;
 public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
     private static final Logger logger = LogManager.getLogger(EmissionsMapper.class);
 
-    private static final Map<Emission, Integer> TABLE_ROW_INDEX_BY_EMISSION_TYPE = Map.of(
-            Emission.NOX, 1,
-            Emission.CO, 2,
-            Emission.CO2, 3,
-            Emission.HC, 4,
-            Emission.PM, 5,
-            Emission.SO2, 6
-    );
-
     @Override
     public EmissionsDataContainer mapDocument(Document document) {
         EmissionsDataContainer emissions = EmissionsDataContainer.empty();
@@ -37,32 +29,38 @@ public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
         }
 
         Map<Emission, Double> collect =
-                TABLE_ROW_INDEX_BY_EMISSION_TYPE.entrySet()
-                                                .stream()
-                                                .map(e -> {
-                                                    Double v;
-                                                    try {
-                                                        v = mapEmissionFromRow(table.get(), e.getValue());
-                                                    } catch (ParseException ex) {
-                                                        logger.warn("Could not parse emission value for {}",
-                                                                e.getKey());
-                                                        return Optional.<Map.Entry<Emission, Double>>empty();
-                                                    }
-                                                    return Optional.of(Map.entry(e.getKey(), v));
-                                                })
-                                                .filter(Optional::isPresent)
-                                                .map(Optional::get)
-                                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                Emission.STRING_IDENTIFIER_BY_EMISSION.entrySet()
+                                                      .stream()
+                                                      .map(e -> {
+                                                          Double v;
+                                                          try {
+                                                              v = mapEmissionFromRow(table.get(), e.getValue());
+                                                          } catch (ParseException ex) {
+                                                              logger.warn("Could not parse emission value for {}",
+                                                                      e.getKey());
+                                                              return Optional.<Map.Entry<Emission, Double>>empty();
+                                                          }
+                                                          return Optional.of(Map.entry(e.getKey(), v));
+                                                      })
+                                                      .filter(Optional::isPresent)
+                                                      .map(Optional::get)
+                                                      .collect(Collectors.toMap(Map.Entry::getKey,
+                                                              Map.Entry::getValue));
 
         return new EmissionsDataContainer(collect);
     }
 
-    private Double mapEmissionFromRow(Element table, int rowIndex) throws ParseException {
+    private Double mapEmissionFromRow(Element table, String key) throws ParseException {
+        Optional<Element> row = JSoupUtils.firstRowWithKeyInCol(table, key, 0);
+        if (row.isEmpty()) {
+            logger.warn("Could not find row with key {}.", key);
+            return null;
+        }
+
         return NumberFormat.getInstance(Locale.GERMANY)
-                           .parse(table.select("tr")
-                                       .get(rowIndex)
-                                       .child(3)
-                                       .text())
+                           .parse(row.get()
+                                     .child(3)
+                                     .text())
                            .doubleValue();
     }
 

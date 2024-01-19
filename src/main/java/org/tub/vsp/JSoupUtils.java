@@ -2,6 +2,9 @@ package org.tub.vsp;
 
 import org.jsoup.nodes.Element;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 import java.util.Optional;
 
 public class JSoupUtils {
@@ -20,5 +23,11 @@ public class JSoupUtils {
                                   .text()
                                   .contains(key))
                     .findFirst();
+    }
+
+    public static Double parseDouble(String s) throws ParseException {
+        return NumberFormat.getInstance(Locale.GERMANY)
+                           .parse(s)
+                           .doubleValue();
     }
 }

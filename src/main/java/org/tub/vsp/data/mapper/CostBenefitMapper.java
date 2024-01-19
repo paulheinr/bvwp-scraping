@@ -10,10 +10,8 @@ import org.tub.vsp.data.type.Benefit;
 import org.tub.vsp.data.type.Cost;
 import org.tub.vsp.data.type.Emission;
 
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -85,8 +83,8 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
         Double costs;
         Double overallCosts;
         try {
-            costs = parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 1));
-            overallCosts = parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 2));
+            costs = JSoupUtils.parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 1));
+            overallCosts = JSoupUtils.parseDouble(JSoupUtils.getTextFromRowAndCol(table, 3, 2));
         } catch (ParseException e) {
             logger.warn("Could not parse benefit value from {}", table);
             return null;
@@ -109,12 +107,12 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
         Double annualBenefits;
         Double overallBenefits;
         try {
-            annualBenefits = parseDouble(e.select("td")
-                                          .get(2)
-                                          .text());
-            overallBenefits = parseDouble(e.select("td")
-                                           .get(3)
-                                           .text());
+            annualBenefits = JSoupUtils.parseDouble(e.select("td")
+                                                     .get(2)
+                                                     .text());
+            overallBenefits = JSoupUtils.parseDouble(e.select("td")
+                                                      .get(3)
+                                                      .text());
         } catch (ParseException ex) {
             logger.warn("Could not parse benefit value from {}", e);
             return null;
@@ -123,16 +121,13 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
     }
 
     private Map<Emission, Benefit> extractEmissionsBenefit(Element table) {
-        return Emission.STRING_IDENTIFIER_BY_EMISSION.entrySet()
-                                                     .stream()
-                                                     .map(e -> Map.entry(e.getKey(), extractSimpleBenefit(table,
-                                                             e.getValue(), 0)))
-                                                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Emission.STRING_IDENTIFIER_BY_EMISSION_WITH_LIFE_CYCLE_CO2
+                .entrySet()
+                .stream()
+                .map(e -> Map.entry(e.getKey(), extractSimpleBenefit(table, e.getValue(), 0)))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue));
     }
 
-    private Double parseDouble(String s) throws ParseException {
-        return NumberFormat.getInstance(Locale.GERMANY)
-                           .parse(s)
-                           .doubleValue();
-    }
+
 }

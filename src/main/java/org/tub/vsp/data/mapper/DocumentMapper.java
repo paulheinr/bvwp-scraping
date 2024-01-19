@@ -1,4 +1,4 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp.data.mapper;
 
 import org.jsoup.nodes.Document;
 

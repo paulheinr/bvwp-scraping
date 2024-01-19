@@ -2,7 +2,6 @@ package org.tub.vsp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.tub.vsp.data.scraper.StreetScraper;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,10 +1,13 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tub.vsp.data.container.StreetBaseDataContainer;
+import org.tub.vsp.data.mapper.CostBenefitMapper;
+import org.tub.vsp.data.mapper.PhysicalEffectMapper;
+import org.tub.vsp.data.mapper.ProjectInformationMapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -51,7 +54,7 @@ public class StreetScraper extends Scraper {
                                                   .setProjectInformation(new ProjectInformationMapper().mapDocument(doc)));
     }
 
-    protected Optional<StreetBaseDataContainer> getStreetBaseData(Document doc) {
+    public Optional<StreetBaseDataContainer> getStreetBaseData(Document doc) {
         if (!checkIfProjectIsScrapable(doc)) {
             return Optional.empty();
         }

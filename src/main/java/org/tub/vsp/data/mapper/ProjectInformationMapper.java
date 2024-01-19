@@ -1,4 +1,4 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp.data.mapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,10 +25,15 @@ public class ProjectInformationMapper implements DocumentMapper<ProjectInformati
     }
 
     private static String extractInformation(Document document, int tableIndex, String key) {
-        Optional<String> info = document.select("table.table_grunddaten").get(tableIndex).select("tr").stream()
-                                        .filter(r -> r.text().contains(key))
+        Optional<String> info = document.select("table.table_grunddaten")
+                                        .get(tableIndex)
+                                        .select("tr")
+                                        .stream()
+                                        .filter(r -> r.text()
+                                                      .contains(key))
                                         .findFirst()
-                                        .map(r -> r.child(1).text());
+                                        .map(r -> r.child(1)
+                                                   .text());
         if (info.isEmpty()) {
             logger.warn("Could not find information for key {} in table {}", key, tableIndex);
         }

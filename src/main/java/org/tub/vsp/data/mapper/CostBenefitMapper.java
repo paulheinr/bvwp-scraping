@@ -1,4 +1,4 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp.data.mapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

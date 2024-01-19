@@ -1,4 +1,4 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +20,8 @@ public abstract class Scraper {
     public List<String> getProjectUrls() throws IOException {
         logger.info("Scraping projects from {}", getBaseUrl());
 
-        Document doc = Jsoup.connect(getBaseUrl()).get();
+        Document doc = Jsoup.connect(getBaseUrl())
+                            .get();
         Elements links = doc.select("a[href]");
         List<String> projectUrls = new ArrayList<>();
 

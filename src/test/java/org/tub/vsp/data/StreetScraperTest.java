@@ -1,10 +1,10 @@
-package org.tub.vsp.data.scraper;
+package org.tub.vsp.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tub.vsp.data.LocalFileAccessor;
+import org.tub.vsp.StreetScraper;
 import org.tub.vsp.data.container.StreetBaseDataContainer;
 
 import java.io.FileReader;

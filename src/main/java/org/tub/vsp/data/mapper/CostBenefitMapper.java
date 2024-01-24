@@ -17,10 +17,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisDataContainer> {
+public class CostBenefitMapper {
     private static final Logger logger = LogManager.getLogger(CostBenefitMapper.class);
 
-    @Override
     public CostBenefitAnalysisDataContainer mapDocument(Document document) {
         CostBenefitAnalysisDataContainer result = new CostBenefitAnalysisDataContainer();
 

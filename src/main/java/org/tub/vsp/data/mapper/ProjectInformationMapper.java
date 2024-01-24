@@ -8,10 +8,9 @@ import org.tub.vsp.data.type.Severity;
 
 import java.util.Optional;
 
-public class ProjectInformationMapper implements DocumentMapper<ProjectInformationDataContainer> {
+public class ProjectInformationMapper {
     private static final Logger logger = LogManager.getLogger(ProjectInformationMapper.class);
 
-    @Override
     public ProjectInformationDataContainer mapDocument(Document document) {
         ProjectInformationDataContainer projectInformation = new ProjectInformationDataContainer();
 

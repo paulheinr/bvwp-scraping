@@ -13,10 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EmissionsMapper implements DocumentMapper<EmissionsDataContainer> {
+public class EmissionsMapper {
     private static final Logger logger = LogManager.getLogger(EmissionsMapper.class);
 
-    @Override
     public EmissionsDataContainer mapDocument(Document document) {
         EmissionsDataContainer emissions = EmissionsDataContainer.empty();
 

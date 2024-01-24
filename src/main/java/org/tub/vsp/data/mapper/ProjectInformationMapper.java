@@ -24,7 +24,7 @@ public class ProjectInformationMapper implements DocumentMapper<ProjectInformati
                                  .setSeverity(Severity.getFromString(severity));
     }
 
-    private static String extractInformation(Document document, int tableIndex, String key) {
+    public static String extractInformation(Document document, int tableIndex, String key) {
         Optional<String> info = document.select("table.table_grunddaten")
                                         .get(tableIndex)
                                         .select("tr")

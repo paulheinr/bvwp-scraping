@@ -24,20 +24,21 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
     public CostBenefitAnalysisDataContainer mapDocument(Document document) {
         CostBenefitAnalysisDataContainer result = new CostBenefitAnalysisDataContainer();
 
-        Optional<Element> costBenefitTable = getTableByKey(document, "table.table_webprins", this::isCostBenefitTable);
-        Optional<Element> costTable = getTableByKey(document, "table.table_kosten", this::isCostTable);
+        Optional<Element> benefit = getTableByKey(document, "table.table_webprins", CostBenefitMapper::isBenefitTable);
+        Optional<Element> costTable = getTableByKey(document, "table.table_kosten", CostBenefitMapper::isCostTable);
 
-        costBenefitTable.ifPresent(element -> result.setNb(extractSimpleBenefit(element, "NB"))
-                                                    .setNw(extractSimpleBenefit(element, "NW"))
-                                                    .setNs(extractSimpleBenefit(element, "NS"))
-                                                    .setNrz(extractSimpleBenefit(element, "NRZ"))
-                                                    .setNtz(extractSimpleBenefit(element, "NTZ"))
-                                                    .setNi(extractSimpleBenefit(element, "NI"))
-                                                    .setNl(extractSimpleBenefit(element, "NL"))
-                                                    .setNg(extractSimpleBenefit(element, "NG"))
-                                                    .setNt(extractSimpleBenefit(element, "NT"))
-                                                    .setNz(extractSimpleBenefit(element, "NZ"))
-                                                    .setNa(extractEmissionsBenefit(element)));
+        benefit.ifPresent(element -> result.setNb(extractSimpleBenefit(element, "NB"))
+                                           .setNw(extractSimpleBenefit(element, "NW"))
+                                           .setNs(extractSimpleBenefit(element, "NS"))
+                                           .setNrz(extractSimpleBenefit(element, "NRZ"))
+                                           .setNtz(extractSimpleBenefit(element, "NTZ"))
+                                           .setNi(extractSimpleBenefit(element, "NI"))
+                                           .setNl(extractSimpleBenefit(element, "NL"))
+                                           .setNg(extractSimpleBenefit(element, "NG"))
+                                           .setNt(extractSimpleBenefit(element, "NT"))
+                                           .setNz(extractSimpleBenefit(element, "NZ"))
+                                           .setNa(extractEmissionsBenefit(element))
+                                           .setOverallBenefit(extractSimpleBenefit(element, "Gesamtnutzen", 0)));
 
         costTable.ifPresent(element -> result.setCost(extractCosts(element)));
 
@@ -61,14 +62,14 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
         return Optional.of(list.getFirst());
     }
 
-    private boolean isCostBenefitTable(Element element) {
+    private static boolean isBenefitTable(Element element) {
         return element.select("tr")
                       .get(1)
                       .text()
                       .contains("Veränderung der Betriebskosten");
     }
 
-    private boolean isCostTable(Element element) {
+    private static boolean isCostTable(Element element) {
         if (element.select("tr")
                    .size() < 4) {
             return false;
@@ -98,12 +99,20 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
     }
 
     private Benefit extractSimpleBenefit(Element table, String key, int columnIndex) {
-        return JSoupUtils.firstRowWithKeyInCol(table, key, columnIndex)
-                         .map(this::extractBenefitFromRow)
-                         .orElse(null);
+        Optional<Benefit> optionalBenefit = extractSimpleBenefitOptional(table, key, columnIndex);
+        if (optionalBenefit.isEmpty()) {
+            logger.warn("Could not find cost benefit for key {}.", key);
+            return null;
+        }
+        return optionalBenefit.get();
     }
 
-    private Benefit extractBenefitFromRow(Element e) {
+    private Optional<Benefit> extractSimpleBenefitOptional(Element table, String key, int columnIndex) {
+        return JSoupUtils.firstRowWithKeyInCol(table, key, columnIndex)
+                         .flatMap(this::extractBenefitFromRow);
+    }
+
+    private Optional<Benefit> extractBenefitFromRow(Element e) {
         Double annualBenefits;
         Double overallBenefits;
         try {
@@ -115,18 +124,21 @@ public class CostBenefitMapper implements DocumentMapper<CostBenefitAnalysisData
                                                       .text());
         } catch (ParseException ex) {
             logger.warn("Could not parse benefit value from {}", e);
-            return null;
+            return Optional.empty();
         }
-        return new Benefit(annualBenefits, overallBenefits);
+        return Optional.of(new Benefit(annualBenefits, overallBenefits));
     }
 
     private Map<Emission, Benefit> extractEmissionsBenefit(Element table) {
         return Emission.STRING_IDENTIFIER_BY_EMISSION_WITHOUT_CO2_OVERALL
                 .entrySet()
                 .stream()
-                .map(e -> Map.entry(e.getKey(), extractSimpleBenefit(table, e.getValue(), 0)))
+                .map(e -> Map.entry(e.getKey(), extractSimpleBenefitOptional(table, e.getValue(), 0)))
+                .filter(e -> e.getValue()
+                              .isPresent())
                 .collect(Collectors.toMap(Map.Entry::getKey,
-                        Map.Entry::getValue));
+                        e -> e.getValue()
+                              .get()));
     }
 
 

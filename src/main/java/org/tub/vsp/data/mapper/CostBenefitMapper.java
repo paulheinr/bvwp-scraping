@@ -60,7 +60,8 @@ public class CostBenefitMapper {
             return Optional.empty();
         }
 
-        return Optional.of(list.getFirst());
+//        return Optional.of(list.getFirst());
+        return Optional.of(list.get(0));
     }
 
     //The table with "Veränderung der Betriebskosten" in its second row corresponds to the benefit table

@@ -25,6 +25,7 @@ public class EmissionsMapper {
             return emissions;
         }
 
+        //Creating the map for the emissions data container
         Map<Emission, Double> collect =
                 Emission.STRING_IDENTIFIER_BY_EMISSION_WITHOUT_CO2_OVERALL
                         .entrySet()
@@ -47,6 +48,7 @@ public class EmissionsMapper {
         return new EmissionsDataContainer(collect);
     }
 
+    //get emission value for one specific emission
     private Optional<Map.Entry<Emission, Double>> getEmissionDoubleEntry(Map.Entry<Emission, String> e, Element table) {
         Optional<Double> v;
         try {
@@ -70,6 +72,7 @@ public class EmissionsMapper {
                                                      .text()));
     }
 
+    //mapping the CO2 overall equivalents value
     private Double getCO2Overall(Element table) {
         return JSoupUtils.firstRowWithKeyContainedInCol(table, Emission.STRING_IDENTIFIER_CO2_OVERALL_EQUIVALENTS, 1)
                          .map(r -> {

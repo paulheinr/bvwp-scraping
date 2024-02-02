@@ -23,6 +23,8 @@ public class ProjectInformationMapper {
                                  .setSeverity(Severity.getFromString(severity));
     }
 
+    //mapping information from the grunddaten table. There are two tables with the same class, so we need to specify
+    // the index
     public static String extractInformation(Document document, int tableIndex, String key) {
         Optional<String> info = document.select("table.table_grunddaten")
                                         .get(tableIndex)

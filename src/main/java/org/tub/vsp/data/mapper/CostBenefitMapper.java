@@ -26,6 +26,7 @@ public class CostBenefitMapper {
         Optional<Element> benefit = getTableByKey(document, "table.table_webprins", CostBenefitMapper::isBenefitTable);
         Optional<Element> costTable = getTableByKey(document, "table.table_kosten", CostBenefitMapper::isCostTable);
 
+        //We only scrape the cumulated values
         benefit.ifPresent(element -> result.setNb(extractSimpleBenefit(element, "NB"))
                                            .setNw(extractSimpleBenefit(element, "NW"))
                                            .setNs(extractSimpleBenefit(element, "NS"))
@@ -36,6 +37,7 @@ public class CostBenefitMapper {
                                            .setNg(extractSimpleBenefit(element, "NG"))
                                            .setNt(extractSimpleBenefit(element, "NT"))
                                            .setNz(extractSimpleBenefit(element, "NZ"))
+                                           //Only for emissions we scrape the individual values
                                            .setNa(extractEmissionsBenefit(element))
                                            .setOverallBenefit(extractSimpleBenefit(element, "Gesamtnutzen", 0)));
 
@@ -61,6 +63,7 @@ public class CostBenefitMapper {
         return Optional.of(list.getFirst());
     }
 
+    //The table with "Veränderung der Betriebskosten" in its second row corresponds to the benefit table
     private static boolean isBenefitTable(Element element) {
         return element.select("tr")
                       .get(1)
@@ -68,6 +71,7 @@ public class CostBenefitMapper {
                       .contains("Veränderung der Betriebskosten");
     }
 
+    //The table with "Summe bewertungsrelevanter Investitionskosten" in its third row corresponds to the cost table
     private static boolean isCostTable(Element element) {
         if (element.select("tr")
                    .size() < 4) {
@@ -97,8 +101,8 @@ public class CostBenefitMapper {
         return extractSimpleBenefit(table, key, 1);
     }
 
-    private Benefit extractSimpleBenefit(Element table, String key, int columnIndex) {
-        Optional<Benefit> optionalBenefit = extractSimpleBenefitOptional(table, key, columnIndex);
+    private Benefit extractSimpleBenefit(Element table, String key, int keyColumnIndex) {
+        Optional<Benefit> optionalBenefit = extractSimpleBenefitOptional(table, key, keyColumnIndex);
         if (optionalBenefit.isEmpty()) {
             logger.warn("Could not find cost benefit for key {}.", key);
             return null;
@@ -106,8 +110,8 @@ public class CostBenefitMapper {
         return optionalBenefit.get();
     }
 
-    private Optional<Benefit> extractSimpleBenefitOptional(Element table, String key, int columnIndex) {
-        return JSoupUtils.firstRowWithKeyInCol(table, key, columnIndex)
+    private Optional<Benefit> extractSimpleBenefitOptional(Element table, String key, int keyColumnIndex) {
+        return JSoupUtils.firstRowWithKeyInCol(table, key, keyColumnIndex)
                          .flatMap(this::extractBenefitFromRow);
     }
 
